@@ -7,8 +7,6 @@ using System.Threading.Tasks;
 
 namespace CleanTesting.Application.IntegrationTests.TodoLists.Queries
 {
-    using static Testing;
-
     public class GetTodosTests : TestBase
     {
         [Test]

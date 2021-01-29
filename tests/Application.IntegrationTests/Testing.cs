@@ -53,8 +53,12 @@ namespace CleanTesting.Application.IntegrationTests
             services.Remove(currentUserServiceDescriptor);
 
             // Register testing version
-            services.AddScoped(provider =>
-                Mock.Of<ICurrentUserService>(s => s.UserId == _currentUserId));
+            services.AddTransient<ICurrentUserService>(provider =>
+            {
+                var res = new Mock<ICurrentUserService>();
+                res.SetupGet(x => x.UserId).Returns(() => _currentUserId);
+                return res.Object;
+            });
 
             _scopeFactory = services.BuildServiceProvider().GetService<IServiceScopeFactory>();
 
@@ -75,6 +79,11 @@ namespace CleanTesting.Application.IntegrationTests
             context.Database.Migrate();
         }
 
+        public static IServiceScope CreateScope()
+        {
+            return _scopeFactory.CreateScope();
+        }
+
         public static async Task ResetState()
         {
             await _checkpoint.Reset(_configuration.GetConnectionString("DefaultConnection"));
@@ -82,21 +91,17 @@ namespace CleanTesting.Application.IntegrationTests
             _currentUserId = null;
         }
 
-        public static async Task<TEntity> FindAsync<TEntity>(int id)
+        public static async Task<TEntity> FindAsync<TEntity>(int id, IServiceScope scope)
             where TEntity : class
         {
-            using var scope = _scopeFactory.CreateScope();
-
             var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
 
             return await context.FindAsync<TEntity>(id);
         }
 
-        public static async Task AddAsync<TEntity>(TEntity entity)
+        public static async Task AddAsync<TEntity>(TEntity entity, IServiceScope scope)
             where TEntity : class
         {
-            using var scope = _scopeFactory.CreateScope();
-
             var context = scope.ServiceProvider.GetService<ApplicationDbContext>();
 
             context.Add(entity);
@@ -104,21 +109,17 @@ namespace CleanTesting.Application.IntegrationTests
             await context.SaveChangesAsync();
         }
 
-        public static async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request)
+        public static async Task<TResponse> SendAsync<TResponse>(IRequest<TResponse> request, IServiceScope scope)
         {
-            using var scope = _scopeFactory.CreateScope();
-
             var mediator = scope.ServiceProvider.GetService<IMediator>();
 
             return await mediator.Send(request);
         }
 
-        public static async Task<string> RunAsDefaultUserAsync()
+        public static async Task<string> RunAsDefaultUserAsync(IServiceScope scope)
         {
             var userName = "test@local";
             var password = "Testing1234!";
-
-            using var scope = _scopeFactory.CreateScope();
 
             var userManager = scope.ServiceProvider.GetService<UserManager<ApplicationUser>>();
 

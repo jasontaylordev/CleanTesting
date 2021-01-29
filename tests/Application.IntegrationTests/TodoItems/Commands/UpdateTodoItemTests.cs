@@ -10,8 +10,6 @@ using System;
 
 namespace CleanTesting.Application.IntegrationTests.TodoItems.Commands
 {
-    using static Testing;
-
     public class UpdateTodoItemTests : TestBase
     {
         [Test]
