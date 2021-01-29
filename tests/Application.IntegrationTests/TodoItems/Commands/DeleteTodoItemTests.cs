@@ -9,8 +9,6 @@ using NUnit.Framework;
 
 namespace CleanTesting.Application.IntegrationTests.TodoItems.Commands
 {
-    using static Testing;
-
     public class DeleteTodoItemTests : TestBase
     {
         [Test]

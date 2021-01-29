@@ -9,8 +9,6 @@ using System.Threading.Tasks;
 
 namespace CleanTesting.Application.IntegrationTests.TodoItems.Commands
 {
-    using static Testing;
-
     public class CreateTodoItemTests : TestBase
     {
         [Test]

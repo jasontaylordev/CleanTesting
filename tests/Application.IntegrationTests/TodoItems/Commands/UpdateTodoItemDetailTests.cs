@@ -12,8 +12,6 @@ using System;
 
 namespace CleanTesting.Application.IntegrationTests.TodoItems.Commands
 {
-    using static Testing;
-
     public class UpdateTodoItemDetailTests : TestBase
     {
         [Test]
